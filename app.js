@@ -73,6 +73,7 @@ app.post('/getgenre', function (req, res) {
     request("http://www.imdb.com"+movie.title, function (error, response, body) { 
 
       var genresArr = [];
+      var $ = cheerio.load(body);
       $("div[itemprop=genre] a").each(function(ele) {
         genresArr.push($(this).text());
       });
