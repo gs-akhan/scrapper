@@ -9,12 +9,19 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+var query = require('url')
+var cheerio = require('cheerio');
+var request = require('request');
 
+var path = require('path');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
+app.use(function (req,res,next) {
+    req.qp = query.parse(req.url,true).query;
+    next();
+});
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
@@ -24,9 +31,19 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/getgenre', function (req, res) {
-  res.json({
-    name : "Rajdeep",
-    title : "Cool Dude !!" 
+  console.log(path.join("http://www.imdb.com/title/",req.qp.title));
+  request("http://www.imdb.com/title/"+req.qp.title, function (error, response, body) {
+    
+    var $ = cheerio.load(body);
+    var genresArr = [];
+    $("div[itemprop=genre] a").each(function(ele) {
+      genresArr.push($(this).text());
+    });
+    res.json({
+      title : req.qp.title,
+      genre : genresArr.toString().replace(/\s/g, "")
+    });
+    
   })
 });
 
