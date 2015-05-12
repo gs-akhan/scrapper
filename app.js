@@ -53,7 +53,7 @@ app.post('/getgenre', function (req, res) {
   console.log(req.body);
 
 
-  var allMovies = JSON.parse(req.body);
+  var allMovies = req.body;
   var allMoviewsArray = [];
   var movieAndGenre = {};
 
