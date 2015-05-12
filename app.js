@@ -69,7 +69,7 @@ app.post('/getgenre', function (req, res) {
   console.log(allMoviewsArray);
 
 
-  async.each(allMoviewsArray, function (movie, callback) {
+  async.eachLimit(allMoviewsArray, 10, function (movie, callback) {
     request("http://www.imdb.com"+movie.title, function (error, response, body) { 
 
       var genresArr = [];
