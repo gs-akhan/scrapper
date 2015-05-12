@@ -32,8 +32,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/getgenre', function (req, res) {
   console.log(path.join("http://www.imdb.com/title/",req.qp.title));
+  console.log("DATA HERE");
+  console.log(req.body);
   request("http://www.imdb.com/title/"+req.qp.title, function (error, response, body) {
-    
     var $ = cheerio.load(body);
     var genresArr = [];
     $("div[itemprop=genre] a").each(function(ele) {
