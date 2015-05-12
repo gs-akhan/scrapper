@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var async = require('async');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -50,18 +51,49 @@ app.get('/getgenre', function (req, res) {
 app.post('/getgenre', function (req, res) {
   console.log("DATA HERE");
   console.log(req.body);
-  request("http://www.imdb.com/title/"+req.qp.title, function (error, response, body) {
-    var $ = cheerio.load(body);
-    var genresArr = [];
-    $("div[itemprop=genre] a").each(function(ele) {
-      genresArr.push($(this).text());
+
+
+  var allMovies = JSON.parse(req.body);
+  var allMoviewsArray = [];
+  var movieAndGenre = {};
+
+  for(var k in allMovies) {
+    allMoviewsArray.push({
+      id :  k,
+      title :  allMovies[k]
     });
-    res.json({
-      title : req.qp.title,
-      genre : genresArr.toString().replace(/\s/g, "")
+  }
+
+
+  console.log("This are all movies");
+  console.log(allMoviewsArray);
+
+
+  async.each(allMoviewsArray, function (movie, callback) {
+    request("http://www.imdb.com"+movie.title, function (error, response, body) { 
+
+      var genresArr = [];
+      $("div[itemprop=genre] a").each(function(ele) {
+        genresArr.push($(this).text());
+      });
+
+      movieAndGenre[movie.id] = genresArr.toString().replace(/\s/g, "");
+      callback(null);
     });
-    
-  })
+
+    // body...
+  }, function (err) {
+    if(err) {
+      console.log("FAILED")
+    }
+    else {
+      console.log('WE ARE DONE');
+      res.json(movieAndGenre);
+    }
+  });  
+
+
+ 
 });
 
 // catch 404 and forward to error handler
