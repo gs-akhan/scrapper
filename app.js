@@ -23,8 +23,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
+app.get('/getgenre', function (req, res) {
+  res.json({
+    name : "Rajdeep",
+    title : "Cool Dude !!" 
+  })
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
